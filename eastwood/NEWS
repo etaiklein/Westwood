@@ -1,0 +1,69 @@
+Eastwood 1.1.0
+--------------
+18-Jul-2008
+
+The second release of Eastwood Charts adds some important new features, 
+some matching features from the Google Chart API and others extending it,
+including:
+
+- support for the sparkline chart type ('cht=ls');
+- support for chart data scaling ('chds');
+- new custom chart types supporting a 3D-effect on bar charts - just add a '3' 
+      to the corresponding bar chart type ('cht=bvg3/bhg3/bvs3/bhs3');
+- new 'ewd2' and 'ewtr' tags to support trendlines on bar charts and scatter
+      plots;
+- configurable fonts for the servlet;
+
+The source code has been refactored to allow the chart engine to be reused 
+outside of a servlet environment, for example in a client application (see the
+org.jfree.eastwood.Application class) or an applet (see 
+org.jfree.eastwood.ChartApplet).
+  
+In addition to the new features in this release, a number of bugs have been 
+eliminated, and we've added some JUnit tests. 
+
+The licence for the Eastwood has been changed to the GNU Lesser General Public 
+Licence version 2.1 or later, matching the licence used for JFreeChart.  This
+will mean (hopefully) we spend less time talking about licence terms, and more 
+time coding.
+
+Special thanks to Niklas Therning who has made several important contributions 
+to this release.
+
+Patches:
+2003913 - disable plot border;
+2002341 - 'chdl' and 'chdlp' support;
+2001783 - support for UTF-8 and '%' in labels;
+2001586 - Maven pom.xml.
+
+Bug Fixes:
+1872190 - pie chart label background paint;
+1901369 - 'chdl' not working for bar charts;
+1908089 - % not working for axis labels.
+
+
+Eastwood 1.0.0
+--------------
+13 December 2007
+
+Welcome to the first release of the Eastwood Chart Servlet.  This servlet 
+emulates the recently released Google Chart API, using code that you install 
+and run on your own server.  The advantage of this is that you don't HAVE to 
+rely on Google to generate your charts.  The disadvantage is that you don't 
+GET to rely on Google to generate your charts :)
+
+The Eastwood Chart Servlet is Free Software (licensed under the terms of the
+GNU Affero General Public Licence), so you have complete control over the 
+chart generation process - you can modify it, fix bugs, tweak settings, or just
+run it as is.
+
+PLEASE NOTE THAT THIS INITIAL RELEASE ALMOST CERTAINLY CONTAINS BUGS.  We 
+wanted to get this release out quickly (the Google Chart API was released just 
+one week ago), so please report any issues you encounter.
+    
+Thanks!
+
+Dave Gilbert
+Eastwood Project Leader
+http://www.jfree.org/eastwood/
+

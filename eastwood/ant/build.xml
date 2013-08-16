@@ -1,0 +1,157 @@
+<!-- An ANT build file for the Eastwood Chart Servlet project -->
+
+<!-- Written by David Gilbert. -->
+
+<!-- Tested with Ant 1.6.5 -->
+
+<!-- This script will create temporary directories ../build and -->
+<!-- ../distribution, as working areas. -->
+
+
+<project name="eastwood" default="all" basedir="..">
+
+    <!-- Initialisation. -->
+    <target name="initialise" description="Initialise required settings.">
+        <tstamp />
+    	<property name="eastwood.name" value="eastwood" />
+    	<property name="eastwood.version" value="1.1.0" />
+        <property name="jfreechart.name" value="jfreechart" />
+        <property name="jfreechart.version" value="1.0.10" />
+        <property name="jfreechart.jar" value="${basedir}/lib/${jfreechart.name}-${jfreechart.version}.jar"/>
+        <property name="jcommon.name" value="jcommon" />
+        <property name="jcommon.version" value="1.0.13" />
+        <property name="jcommon.jar" value="${basedir}/lib/${jcommon.name}-${jcommon.version}.jar"/>
+        <property name="builddir" value="${basedir}/build" />
+        <property name="servlet.jar" value="${basedir}/lib/servlet.jar"/>
+        <path id="build.classpath">
+            <pathelement location="${jcommon.jar}"/>
+        	<pathelement location="${jfreechart.jar}"/>
+            <pathelement location="${servlet.jar}"/>
+        </path>
+
+    </target>
+
+    <!-- Compile the Eastwood classes -->
+    <target name="compile" depends="initialise"
+            description="Compile the Eastwood source code.">
+
+        <!-- create a temp build directory -->
+        <mkdir dir="${basedir}/build" />
+
+        <!-- compile the source -->
+        <javac srcdir="${basedir}/source" 
+               destdir="${basedir}/build"
+               debug="on"
+               deprecation="false"
+               source="1.4"
+               target="1.4">
+            <classpath refid="build.classpath" />
+            <include name="org/jfree/eastwood/**"/>
+        </javac>
+
+        <!-- make the jar -->
+        <jar jarfile="${basedir}/lib/${eastwood.name}-${eastwood.version}.jar"
+             basedir="${basedir}/build" >
+        </jar>
+
+        <!-- delete the temp directory -->
+        <delete dir="${basedir}/build" />
+
+    </target>
+
+	<!-- Make a WAR file -->
+	<target name="makewar" depends="compile" description="Make the WAR file.">
+	  <war destfile="${eastwood.name}.war" webxml="web.xml">
+	    <lib dir="lib">
+	      <exclude name="servlet.jar"/>
+	    </lib>
+	  </war>
+    </target>
+
+    <!-- Fill the 'distribution' directory. -->
+    <target name="fill-distribution" depends="makewar">
+	
+        <!-- delete the temporary distribution directory, if there is one -->
+        <delete dir="${basedir}/distribution" />
+
+    	<!-- make a temporary distribution directory -->
+        <mkdir dir="${basedir}/distribution" />
+
+        <!-- copy across README and CHANGELOG and manual.rtf-->
+        <copy file="${basedir}/README.txt" tofile="${basedir}/distribution/README.txt" />
+        <copy file="${basedir}/NEWS" tofile="${basedir}/distribution/NEWS" />
+        <copy file="${basedir}/manual.rtf" tofile="${basedir}/distribution/manual.rtf" />
+
+        <!-- copy across LICENCE -->
+        <copy file="${basedir}/licence-LGPL.txt" tofile="${basedir}/distribution/licence-LGPL.txt" />
+    
+        <!-- copy across web.xml -->
+        <copy file="${basedir}/web.xml" tofile="${basedir}/distribution/web.xml" />
+
+    	<!-- copy across test.html -->
+    	<copy file="${basedir}/test.html" tofile="${basedir}/distribution/test.html" />
+
+        <!-- copy across source files -->
+        <copy todir="${basedir}/distribution/source">
+            <fileset dir="${basedir}/source">
+            </fileset>
+        </copy>
+
+        <copy todir="${basedir}/distribution/tests">
+            <fileset dir="${basedir}/tests">
+            </fileset>
+        </copy>
+
+        <!-- copy across war file -->
+        <copy file="${eastwood.name}.war" tofile="${basedir}/distribution/${eastwood.name}-${eastwood.version}.war" />
+
+        <!-- copy across lib files -->
+        <copy file="${jfreechart.jar}" tofile="${basedir}/distribution/lib/${jfreechart.name}-${jfreechart.version}.jar" />
+        <copy file="${jcommon.jar}" tofile="${basedir}/distribution/lib/${jcommon.name}-${jcommon.version}.jar" />
+        <copy file="${servlet.jar}" tofile="${basedir}/distribution/lib/servlet.jar" />
+
+        <!-- copy across ant build files -->
+        <copy file="${basedir}/ant/build.xml" tofile="${basedir}/distribution/ant/build.xml" />
+
+        <!-- convert end-of-line characters in text files -->
+        <fixcrlf srcdir="${basedir}/distribution/source"
+                 eol="crlf" eof="remove"
+                 excludes="**/*.jpg" />
+
+    </target>
+
+    <!-- Make .zip distribution for Eastwood -->
+    <target name="zip" depends="fill-distribution">
+
+        <!-- make the zip file -->
+        <zip zipfile="${basedir}/${eastwood.name}-${eastwood.version}.zip">
+             <zipfileset dir="${basedir}/distribution"
+                         prefix="${eastwood.name}-${eastwood.version}" />
+        </zip>
+
+    </target>
+
+    <!-- Make .tar.gz distribution for Eastwood -->
+    <target name="targz" depends="fill-distribution">
+
+        <!-- make the tar.gz file -->
+        <tar tarfile="${basedir}/${eastwood.name}-${eastwood.version}.tar">
+             <tarfileset dir="${basedir}/distribution"
+                         prefix="${eastwood.name}-${eastwood.version}" />
+        </tar>
+        <gzip zipfile="${basedir}/${eastwood.name}-${eastwood.version}.tar.gz"   
+              src="${basedir}/${eastwood.name}-${eastwood.version}.tar" />
+        <delete file="${basedir}/${eastwood.name}-${eastwood.version}.tar" />
+
+    </target>
+
+    <!-- ALL -->
+    <target name="all" 
+            depends="compile,zip,targz"
+            description="Compiles Eastwood, builds the jar files, and creates distribution files (.zip and .tar.gz).">
+
+        <!-- delete the temporary distribution directory -->
+        <delete dir="${basedir}/distribution" />    
+    </target>
+
+</project>
